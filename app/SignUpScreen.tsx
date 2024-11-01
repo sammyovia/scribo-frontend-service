@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from './navigationTypes'; // Adjust the path as necessary
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'Tabs'>;
-
-const LoginScreen: React.FC = () => {
+const SignUpScreen: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const navigation = useNavigation<NavigationProp>();
+    const navigation = useNavigation();
 
-    const handleLogin = async () => {
+    const handleSignUp = async () => {
         try {
-            // Replace with your authentication logic
-            const response = await fetch('https://one0-dollar-backend-service.onrender.com/authentication/login', {
+            const response = await fetch('https://one0-dollar-backend-service.onrender.com/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -22,23 +17,21 @@ const LoginScreen: React.FC = () => {
                 body: JSON.stringify({ email, password }),
             });
 
-            if (!response.ok) {
-                throw new Error('Login failed');
+            if (response.ok) {
+                Alert.alert('Success', 'You have signed up successfully!');
+                navigation.navigate('tabs'); // Redirect to the Tabs navigator
+            } else {
+                const errorData = await response.json();
+                Alert.alert('Error', errorData.message || 'Something went wrong!');
             }
-
-            const data = await response.json();
-            console.log('Login successful:', data);
-
-            // Navigate to the Tabs screen after successful login
-            navigation.navigate('Tabs');
         } catch (error) {
-            console.error('Login error:', error);
+            Alert.alert('Error', 'Failed to sign up. Please try again later.');
         }
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Login</Text>
+            <Text style={styles.title}>Sign Up</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -54,7 +47,7 @@ const LoginScreen: React.FC = () => {
                 onChangeText={setPassword}
                 secureTextEntry
             />
-            <Button title="Login" onPress={handleLogin} />
+            <Button title="Sign Up" onPress={handleSignUp} />
         </View>
     );
 };
@@ -79,4 +72,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default LoginScreen;
+export default SignUpScreen;
